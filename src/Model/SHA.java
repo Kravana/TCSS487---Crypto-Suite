@@ -1,11 +1,8 @@
 package Model;
 
-
 /**
  * @author Kevin Ravna
  * @version Winter2017
  */
-public class SHA3 {
-
-
+public class SHA {
 }
