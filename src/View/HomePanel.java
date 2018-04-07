@@ -55,6 +55,7 @@ public class HomePanel extends JPanel {
         frame.getContentPane().removeAll();
         frame.getContentPane().add(PANELS[index]);
         frame.revalidate();
+        frame.repaint();
     }
 
 
