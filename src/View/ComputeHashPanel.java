@@ -1,11 +1,12 @@
 package View;
 
+import Model.SHA;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-
-import Model.SHA;
 
 /**
  * @author Kevin Ravna
@@ -49,7 +50,7 @@ public class ComputeHashPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 0;
-        this.add(MESSAGE_AREA);
+        this.add(MESSAGE_AREA, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -142,10 +143,12 @@ public class ComputeHashPanel extends JPanel {
 
     private void computeFileHash() {
         try {
-            String hash = SHA.computeWithJavaSec(fileLocation);
+            String hash = SHA.computeFileWithJavaSec(fileLocation);
             FILE_HASH_OUTPUT.setText(hash);
         } catch (NoSuchAlgorithmException e1) {
             e1.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

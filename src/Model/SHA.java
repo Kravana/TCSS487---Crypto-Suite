@@ -1,8 +1,5 @@
 package Model;
 
-import sun.misc.BASE64Encoder;
-
-import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -50,18 +47,21 @@ public class SHA {
             new BigInteger("8000000080008008", 16)
     };
 
-    //	The rotation offsets r[x,y].
-    private int[][] r = new int[][] {
-            {0, 36, 3, 41, 18},
-            {1, 44, 10, 45, 2},
-            {62, 6, 43, 15, 61},
-            {28, 55, 25, 21, 56},
-            {27, 20, 39, 8, 14}
+    int[] keccakf_rotc = {
+            1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 2, 14,
+            27, 41, 56, 8, 25, 43, 62, 18, 39, 61, 20, 44
     };
 
-    private int w;
+    int[] keccakf_piln = {
+            10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4,
+            15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6, 1
+    };
 
-    private int n;
+    int i, j, r;
+
+    BigInteger t;
+    BigInteger[] bc = new BigInteger[5];
+
 
 
 
@@ -84,16 +84,20 @@ public class SHA {
     }
 
     public static String computeFileWithJavaSec(final String fileLoc) throws IOException, NoSuchAlgorithmException {
-        byte[] buffer= new byte[8192];
-        int count;
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fileLoc));
-        while ((count = bis.read(buffer)) > 0) {
-            digest.update(buffer, 0, count);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        FileInputStream fis = new FileInputStream(fileLoc);
+        byte[] dataBytes = new byte[1024];
+        int nread = 0;
+        while ((nread = fis.read(dataBytes)) != -1) {
+            md.update(dataBytes, 0, nread);
+        };
+        byte[] mdbytes = md.digest();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < mdbytes.length; i++) {
+            sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
         }
-        bis.close();
-        byte[] hash = digest.digest();
-        return new BASE64Encoder().encode(hash);
+        System.out.println("Hex format : " + sb.toString());
+        return sb.toString();
     }
 
 
