@@ -109,8 +109,20 @@ public class ComputeHashPanel extends JPanel {
     private JButton computeHashButton() {
         JButton computeHashButton = new JButton("Compute Hash");
         computeHashButton.addActionListener(e -> {
-            computeTextHash();
-            if (fileLocation != null) computeFileHash();
+            try {
+                computeTextHash();
+            } catch (NoSuchAlgorithmException e1) {
+                e1.printStackTrace();
+            }
+            if (fileLocation != null) {
+                try {
+                    computeFileHash();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchAlgorithmException e1) {
+                    e1.printStackTrace();
+                }
+            }
         });
         computeHashButton.setSize(new Dimension(100, computeHashButton.getHeight()));
         return computeHashButton;
@@ -132,23 +144,15 @@ public class ComputeHashPanel extends JPanel {
         frame.repaint();
     }
 
-    private void computeTextHash() {
-        try {
-            String hash = SHA.computeWithJavaSec(MESSAGE_AREA.getText());
-            TEXT_HASH_OUTPUT.setText(hash);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        }
+    private void computeTextHash() throws NoSuchAlgorithmException {
+        String hash = SHA.getHash512(MESSAGE_AREA.getText());
+        SHA.computeWithJavaSec(MESSAGE_AREA.getText());
+        TEXT_HASH_OUTPUT.setText(hash);
     }
 
-    private void computeFileHash() {
-        try {
-            String hash = SHA.computeFileWithJavaSec(fileLocation);
-            FILE_HASH_OUTPUT.setText(hash);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void computeFileHash() throws IOException, NoSuchAlgorithmException {
+        String hash = SHA.getHash512(SHA.convertFileToString(fileLocation));
+        SHA.computeFileWithJavaSec(fileLocation);
+        FILE_HASH_OUTPUT.setText(hash);
     }
 }
