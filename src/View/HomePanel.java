@@ -8,8 +8,8 @@ import java.awt.event.ActionListener;
 
 
 /**
- * @author Kevin Ravna
- * @version Winter2017
+ * @author Kevin Ravana
+ * @version Spring 2018
  */
 public class HomePanel extends JPanel {
 

@@ -4,8 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * @author Kevin Ravna
- * @version Winter2017
+ * @author Kevin Ravana
+ * @version Spring 2018
  */
 public class GUIMain {
 

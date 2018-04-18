@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @author Kevin Ravna
- * @version Winter2017
+ * @author Kevin Ravana
+ * @version Spring 2018
  */
 public class ComputeHashPanel extends JPanel {
 

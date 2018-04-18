@@ -8,7 +8,7 @@ import java.util.Formatter;
  * @author Kevin Ravana
  * @version Spring 2018
  */
-public class Keccak {
+class Keccak {
 
     /**
      * max unsigned long
@@ -157,6 +157,12 @@ public class Keccak {
         }
     }
 
+    /**
+     *
+     * @param A
+     * @param RC
+     * @return
+     */
     private BigInteger[][] roundB(final BigInteger[][] A, BigInteger RC) {
         BigInteger[] C = new BigInteger[5];
         BigInteger[] D = new BigInteger[5];
@@ -188,6 +194,12 @@ public class Keccak {
         return A;
     }
 
+    /**
+     *
+     * @param x
+     * @param n
+     * @return
+     */
     private BigInteger rot(BigInteger x, int n) {
         n = n % LANE_LENGTH;
 
@@ -197,6 +209,12 @@ public class Keccak {
         return leftShift.or(rightShift);
     }
 
+    /**
+     *
+     * @param value
+     * @param shift
+     * @return
+     */
     private BigInteger getShiftLeft64(BigInteger value, int shift) {
         BigInteger retValue = value.shiftLeft(shift);
         BigInteger tmpValue = value.shiftLeft(shift);
@@ -263,18 +281,32 @@ public class Keccak {
         return arrayM;
     }
 
-
+    /**
+     *
+     * @param array
+     */
     private void initArray(BigInteger[] array) {
         for (int i = 0; i < array.length; i++)
             array[i] = new BigInteger("0", 16);
     }
 
+    /**
+     *
+     * @param l
+     * @return
+     */
     private String getReverseHexString(BigInteger l) {
         byte[] array = l.toByteArray();
         reverseByteArray(array);
         return getHexStringByByteArray(array);
     }
 
+    /**
+     *
+     * @param str
+     * @param length
+     * @return
+     */
     private String addZero(String str, int length) {
         String retStr = str;
         for (int i = 0; i < length - str.length(); i ++)
@@ -282,6 +314,10 @@ public class Keccak {
         return retStr;
     }
 
+    /**
+     *
+     * @param array
+     */
     private void reverseByteArray(byte[] array) {
         if (array == null)
             return;
@@ -299,6 +335,11 @@ public class Keccak {
         } // while
     }
 
+    /**
+     *
+     * @param array
+     * @return
+     */
     private String getHexStringByByteArray(byte[] array) {
         if (array == null)
             return null;

@@ -12,8 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 
 /**
- * @author Kevin Ravna
- * @version Winter2017
+ * @author Kevin Ravana
+ * @version Winter 2018
  */
 public class SHA {
 
