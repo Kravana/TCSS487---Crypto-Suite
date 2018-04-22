@@ -145,14 +145,14 @@ public class ComputeHashPanel extends JPanel {
     }
 
     private void computeTextHash() throws NoSuchAlgorithmException {
-        String hash = SHA.getHash512(MESSAGE_AREA.getText());
-        SHA.computeWithJavaSec(MESSAGE_AREA.getText());
+        String hash = SHA.getSHA3512Hash(MESSAGE_AREA.getText());
+        SHA.computeHashWithBC(MESSAGE_AREA.getText());
         TEXT_HASH_OUTPUT.setText(hash);
     }
 
     private void computeFileHash() throws IOException, NoSuchAlgorithmException {
-        String hash = SHA.getHash512(SHA.convertFileToString(fileLocation));
-        SHA.computeFileWithJavaSec(fileLocation);
+        String hash = SHA.getSHA3512Hash(SHA.convertFileToHex(fileLocation));
+        SHA.computeFileHashWithBC(fileLocation);
         FILE_HASH_OUTPUT.setText(hash);
     }
 }
