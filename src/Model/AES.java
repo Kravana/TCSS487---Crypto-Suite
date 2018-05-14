@@ -8,6 +8,7 @@ package Model;
  */
 public class AES {
 
+
     final static private int Nb = 4;
 
     final static private int[] Nk = {4, 6, 8};
@@ -34,8 +35,8 @@ public class AES {
 
         // Input conditions for AES-256
         if (thePlaintextBlock.length == Nb
-                && theCipherKey.length == Nk[8]) {
-
+                && theCipherKey.length == Nk[2]) {
+            inToState(thePlaintextBlock);
 
         }
 
@@ -52,14 +53,49 @@ public class AES {
                           final Byte[] theCipherKey) {
         // Input conditions for AES-256
         if (theCipherTextBlock.length == Nb
-                && theCipherKey.length == Nk[8]) {
-
+                && theCipherKey.length == Nk[2]) {
+            inToState(theCipherTextBlock);
 
         }
 
         return null;
     }
 
+    /**
+     * Plaintext input block is copied into the State array
+     * according to s[r, c] = in[r + 4c].
+     * @param theIn Plaintext input block
+     */
+    private static void inToState(final Byte[] theIn) {
+        for (int i = 0; i < STATE.length; i++) {
+            for (int j = 0; j < Nb; j++) {
+                STATE[i][j] = theIn[i + 4 * j];
+            }
+        }
+    }
+
+    /**
+     * Copies the State to a one dimensional byte array.
+     * @return State array copied to one dimensional byte array.
+     */
+    private static Byte[] stateToOut() {
+        Byte[] out = new Byte[STATE.length * Nb];
+        for (int i = 0; i < STATE.length; i++) {
+            for (int j = 0; j < Nb; j++) {
+                out[i + 4 * j] = STATE[i][j];
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * Transformation in which a Round Key is added to the State
+     * using an XOR operation. Length of Round Key must equal the
+     * size of the State (i.e., for Nb = 4, the Round
+     * Key length equals 128 bits/16 bytes).
+     *
+     */
     private static void addRoundKey() {
 
     }
