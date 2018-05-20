@@ -44,6 +44,19 @@ public class SHA {
         return keccak.getHash(s, 576, 64, "01");
     }
 
+    public static String TextKMACXOF256(String K, String X, int L, String S) {
+        byte[] byteMessage = (X != null) ? X.getBytes(): null;
+        byte[] byteString = (S != null) ? X.getBytes(): null;
+        byte[] blankKey = new byte[0];
+
+        byte[] hash = SHAKE.KMACXOF256(blankKey, byteMessage, L, byteString);
+
+        return Hex.toHexString(hash);
+
+    }
+
+
+
     /**
      * Computes and prints SHA-3-512 hash of theMessage
      * using Bouncy Castle API.
