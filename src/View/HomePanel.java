@@ -14,9 +14,9 @@ import java.awt.event.ActionListener;
 public class HomePanel extends JPanel {
 
 
-    private final String[] SERVICE_NAMES = {"Compute hash"};
+    private final String[] SERVICE_NAMES = {"1: Compute hash", "2: Encrypt/Decrypt"};
 
-    private final JPanel[] PANELS = {new ComputeHashPanel()};
+    private final JPanel[] PANELS = {new ComputeHashPanel(), new EncryptDecryptPanel()};
 
 
     public HomePanel() {

@@ -1,10 +1,12 @@
-package Model;
+package Deprecated;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import Deprecated.Keccak;
+import Model.SHAKE;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -46,7 +48,7 @@ public class SHA {
 
     public static String TextKMACXOF256(String K, String X, int L, String S) {
         byte[] byteMessage = (X != null) ? X.getBytes(): null;
-        byte[] byteString = (S != null) ? X.getBytes(): null;
+        byte[] byteString = (S != null) ? S.getBytes(): null;
         byte[] blankKey = new byte[0];
 
         byte[] hash = SHAKE.KMACXOF256(blankKey, byteMessage, L, byteString);

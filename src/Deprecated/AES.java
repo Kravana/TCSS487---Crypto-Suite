@@ -1,4 +1,4 @@
-package Model;
+package Deprecated;
 
 /**
  * Provides tools to encrypt and decrypt data using the

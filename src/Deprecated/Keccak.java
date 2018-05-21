@@ -1,4 +1,4 @@
-package Model;
+package Deprecated;
 
 import java.math.BigInteger;
 import java.util.Formatter;

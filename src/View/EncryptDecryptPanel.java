@@ -1,7 +1,6 @@
 package View;
 
 import Controller.ToolController;
-import org.bouncycastle.util.encoders.Hex;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,28 +12,29 @@ import java.security.NoSuchAlgorithmException;
  * @author Kevin Ravana
  * @version Spring 2018
  */
-public class ComputeHashPanel extends JPanel {
+public class EncryptDecryptPanel extends JPanel {
 
-    private JLabel TEXT_HASH_OUTPUT = new JLabel();
+    private JTextArea FILE_TO_ENCRYPT = new JTextArea();
 
-    private JLabel FILE_HASH_OUTPUT = new JLabel();
+    private JTextArea DECRYPTED_FILE = new JTextArea();
 
-    private JLabel TEXT_HASH_OUTPUT_LABEL = new JLabel("Text hash: ");
+    private JLabel FILE_TO_ENCRYPT_LABEL = new JLabel("File to encrypt (0x): ");
 
-    private JLabel FILE_HASH_OUTPUT_LABEL = new JLabel("File hash: ");
+    private JLabel DECRYPTED_FILE_LABEL = new JLabel("Decrypted file (0x): ");
 
-    private JTextField MESSAGE_AREA = new JTextField("Enter message to hash here.");
+    private JTextField PASSWORD_AREA = new JTextField("Enter passphrase here.");
 
     private File file;
 
     private String fileLocation;
 
-    public ComputeHashPanel() {
+    public EncryptDecryptPanel() {
         super();
         initialize();
     }
 
     private void initialize() {
+
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.CENTER;
@@ -43,23 +43,23 @@ public class ComputeHashPanel extends JPanel {
 
         gbc.insets = new Insets(0, 6, 6, 0);
 
-        MESSAGE_AREA.setColumns(20);
+        PASSWORD_AREA.setColumns(20);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        this.add(new JLabel("Enter message to hash: "), gbc);
+        this.add(new JLabel("Enter desired passphrase: "), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
-        this.add(MESSAGE_AREA, gbc);
+        this.add(PASSWORD_AREA, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        this.add(new JLabel("or"), gbc);
+        this.add(new JLabel("and"), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        this.add(new JLabel("Select file to hash: "), gbc);
+        this.add(new JLabel("Select file to encrypt: "), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -67,7 +67,7 @@ public class ComputeHashPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        this.add(computeHashButton(), gbc);
+        this.add(encryptFileButton(), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
@@ -75,19 +75,19 @@ public class ComputeHashPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        this.add(TEXT_HASH_OUTPUT_LABEL, gbc);
+        this.add(FILE_TO_ENCRYPT_LABEL, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 4;
-        this.add(TEXT_HASH_OUTPUT, gbc);
+        this.add(FILE_TO_ENCRYPT, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 5;
-        this.add(FILE_HASH_OUTPUT_LABEL, gbc);
+        this.add(DECRYPTED_FILE_LABEL, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 5;
-        this.add(FILE_HASH_OUTPUT, gbc);
+        this.add(DECRYPTED_FILE, gbc);
 
 
     }
@@ -107,17 +107,12 @@ public class ComputeHashPanel extends JPanel {
         return selectFileButton;
     }
 
-    private JButton computeHashButton() {
-        JButton computeHashButton = new JButton("Compute Hash");
+    private JButton encryptFileButton() {
+        JButton computeHashButton = new JButton("Encrypt File");
         computeHashButton.addActionListener(e -> {
-            try {
-                computeTextHash();
-            } catch (NoSuchAlgorithmException e1) {
-                e1.printStackTrace();
-            }
             if (fileLocation != null) {
                 try {
-                    computeFileHash();
+                    encryptFile();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchAlgorithmException e1) {
@@ -145,14 +140,8 @@ public class ComputeHashPanel extends JPanel {
         frame.repaint();
     }
 
-    private void computeTextHash() throws NoSuchAlgorithmException {
-        String hash = ToolController.getKMACXOF256HashString("", MESSAGE_AREA.getText(), 512, "D");
-        System.out.println(Hex.toHexString(MESSAGE_AREA.getText().getBytes()));
-        TEXT_HASH_OUTPUT.setText(hash);
-    }
-
-    private void computeFileHash() throws IOException, NoSuchAlgorithmException {
-        String hash = ToolController.getKMACXOF256HashString("", ToolController.convertFileToHex(fileLocation), 512, "D");
-        FILE_HASH_OUTPUT.setText(hash);
+    private void encryptFile() throws IOException, NoSuchAlgorithmException {
+        FILE_TO_ENCRYPT.setText(ToolController.encrypt(fileLocation, PASSWORD_AREA.getText()));
+        DECRYPTED_FILE.setText(ToolController.decrypt("encrypted_file", PASSWORD_AREA.getText()));
     }
 }

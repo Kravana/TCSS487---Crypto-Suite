@@ -1,6 +1,7 @@
-package Model;
+package Deprecated;
 
-import org.bouncycastle.util.encoders.Hex;
+import Deprecated.SHA;
+
 import java.util.ArrayList;
 
 
@@ -45,14 +46,14 @@ public class KMACXOF256 {
      * @param x
      * @return
      */
-    private static Byte[] rightEncode(final int x) {
+    private static byte[] rightEncode(final int x) {
         int n = 1;
 
         while (!(Math.pow(2, 8*n) > x)) {
             n = n++;
         }
 
-        Byte[] O = new Byte[n + 1];
+        byte[] O = new byte[n + 1];
         resetBaseArray();
         convertToAnyBase(x, 256);
         for (int i = 0; i < n; i++) {
@@ -64,14 +65,14 @@ public class KMACXOF256 {
         return O;
     }
 
-    private static Byte[] leftEncode(final int x) {
+    private static byte[] leftEncode(final int x) {
         int n = 1;
 
         while (!(Math.pow(2, 8*n) > x)) {
             n = n++;
         }
 
-        Byte[] O = new Byte[n + 1];
+        byte[] O = new byte[n + 1];
         resetBaseArray();
         convertToAnyBase(x, 256);
         for (int i = 1; i <= n; i++) {
