@@ -10,9 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Provides access to various cryptographic instruments for learning purposes.
@@ -21,7 +19,7 @@ import java.util.List;
  */
 public class ToolController {
 
-    static boolean tEqualstPrime;
+    private static boolean tEqualstPrime;
 
     ToolController() {
 
@@ -68,7 +66,7 @@ public class ToolController {
         return decryptedMessage;
     }
 
-    static byte[] encryptKMACXOF256(byte[] m, byte[] pw) throws IOException {
+    private static byte[] encryptKMACXOF256(byte[] m, byte[] pw) throws IOException {
         // Get z = Random(512)
         SecureRandom random = new SecureRandom();
         byte[] z = new byte[64];
@@ -99,7 +97,7 @@ public class ToolController {
 
     }
 
-    static byte[] decryptKMACXOF256(byte[] cryptogram, byte[] pw) throws IOException {
+    private static byte[] decryptKMACXOF256(byte[] cryptogram, byte[] pw) throws IOException {
         // Get z
         byte[] z = Arrays.copyOfRange(cryptogram, 0, 64);
 
