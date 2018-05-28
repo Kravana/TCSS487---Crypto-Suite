@@ -14,9 +14,9 @@ import java.security.NoSuchAlgorithmException;
  */
 public class EncryptDecryptPanel extends JPanel {
 
-    private JTextArea FILE_TO_ENCRYPT = new JTextArea();
+    private JTextArea FILE_TO_ENCRYPT = new JTextArea(4, 20);
 
-    private JTextArea DECRYPTED_FILE = new JTextArea();
+    private JTextArea DECRYPTED_FILE = new JTextArea(4, 20);
 
     private JLabel FILE_TO_ENCRYPT_LABEL = new JLabel("File to encrypt (0x): ");
 
@@ -24,9 +24,19 @@ public class EncryptDecryptPanel extends JPanel {
 
     private JTextField PASSWORD_AREA = new JTextField("Enter passphrase here.");
 
-    private File file;
+    private Dimension DEFAULT_BUTTON_SIZE = new Dimension(150, 30);
+
+    private JButton encryptFileButton;
+
+    private JButton decryptFileButton;
+
+    private JScrollPane fileHexPane;
+
+    private JScrollPane cryptogramHexPane;
 
     private String fileLocation;
+
+    private String cryptogramLocation;
 
     public EncryptDecryptPanel() {
         super();
@@ -34,6 +44,32 @@ public class EncryptDecryptPanel extends JPanel {
     }
 
     private void initialize() {
+
+        encryptFileButton = encryptFileButton();
+        encryptFileButton.setEnabled(false);
+        encryptFileButton.setPreferredSize(DEFAULT_BUTTON_SIZE);
+
+        decryptFileButton = decryptFileButton();
+        decryptFileButton.setEnabled(false);
+        decryptFileButton.setPreferredSize(DEFAULT_BUTTON_SIZE);
+
+        JButton selectFileToEncryptButton = selectFileToEncryptButton();
+        selectFileToEncryptButton.setPreferredSize(DEFAULT_BUTTON_SIZE);
+
+        JButton selectFileToDecryptButton = selectFileToDecryptButton();
+        selectFileToDecryptButton.setPreferredSize(DEFAULT_BUTTON_SIZE);
+
+        fileHexPane = new JScrollPane(new JPanel().add(FILE_TO_ENCRYPT),
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        FILE_TO_ENCRYPT.setEditable(false);
+        FILE_TO_ENCRYPT.setLineWrap(true);
+
+        cryptogramHexPane = new JScrollPane(new JPanel().add(DECRYPTED_FILE),
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        DECRYPTED_FILE.setEditable(false);
+        DECRYPTED_FILE.setLineWrap(true);
 
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -59,17 +95,25 @@ public class EncryptDecryptPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        this.add(new JLabel("Select file to encrypt: "), gbc);
+        this.add(new JLabel("Select file/cryptogram: "), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        this.add(selectFileButton(), gbc);
+        this.add(selectFileToEncryptButton, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        this.add(encryptFileButton(), gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        this.add(selectFileToDecryptButton, gbc);
 
         gbc.gridx = 1;
+        gbc.gridy = 3;
+        this.add(encryptFileButton, gbc);
+
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        this.add(decryptFileButton, gbc);
+
+        gbc.gridx = 0;
         gbc.gridy = 3;
         this.add(returnButton(), gbc);
 
@@ -79,7 +123,7 @@ public class EncryptDecryptPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 4;
-        this.add(FILE_TO_ENCRYPT, gbc);
+        this.add(fileHexPane, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -87,19 +131,40 @@ public class EncryptDecryptPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 5;
-        this.add(DECRYPTED_FILE, gbc);
+        this.add(cryptogramHexPane, gbc);
 
 
     }
 
-    private JButton selectFileButton() {
+    private JButton selectFileToEncryptButton() {
         JButton selectFileButton = new JButton("Select File");
         selectFileButton.addActionListener(e -> {
             final JFileChooser fc = new JFileChooser();
+            File workingDirectory = new File(System.getProperty("user.dir"));
+            fc.setCurrentDirectory(workingDirectory);
             int returnValue = fc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                file = fc.getSelectedFile();
+                File file = fc.getSelectedFile();
                 fileLocation = file.getAbsolutePath();
+                encryptFileButton.setEnabled(true);
+                System.out.println(file.getAbsolutePath());
+            }
+        });
+        selectFileButton.setSize(new Dimension(100, selectFileButton.getHeight()));
+        return selectFileButton;
+    }
+
+    private JButton selectFileToDecryptButton() {
+        JButton selectFileButton = new JButton("Select Cryptogram");
+        selectFileButton.addActionListener(e -> {
+            final JFileChooser fc = new JFileChooser();
+            File workingDirectory = new File(System.getProperty("user.dir"));
+            fc.setCurrentDirectory(workingDirectory);
+            int returnValue = fc.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                cryptogramLocation = file.getAbsolutePath();
+                decryptFileButton.setEnabled(true);
                 System.out.println(file.getAbsolutePath());
             }
         });
@@ -113,6 +178,24 @@ public class EncryptDecryptPanel extends JPanel {
             if (fileLocation != null) {
                 try {
                     encryptFile();
+                    fileHexPane.revalidate();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchAlgorithmException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        computeHashButton.setSize(new Dimension(100, computeHashButton.getHeight()));
+        return computeHashButton;
+    }
+
+    private JButton decryptFileButton() {
+        JButton computeHashButton = new JButton("Decrypt File");
+        computeHashButton.addActionListener(e -> {
+            if (cryptogramLocation != null) {
+                try {
+                    decryptFile();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchAlgorithmException e1) {
@@ -141,7 +224,11 @@ public class EncryptDecryptPanel extends JPanel {
     }
 
     private void encryptFile() throws IOException, NoSuchAlgorithmException {
-        FILE_TO_ENCRYPT.setText(ToolController.encrypt(fileLocation, PASSWORD_AREA.getText()));
-        DECRYPTED_FILE.setText(ToolController.decrypt("encrypted_file", PASSWORD_AREA.getText()));
+        ((JTextArea)(fileHexPane.getViewport().getView())).setText(ToolController.encrypt(fileLocation, PASSWORD_AREA.getText()));
     }
+
+    private void decryptFile() throws IOException, NoSuchAlgorithmException {
+        ((JTextArea)(cryptogramHexPane.getViewport().getView())).setText(ToolController.decrypt(cryptogramLocation, PASSWORD_AREA.getText()));
+    }
+
 }

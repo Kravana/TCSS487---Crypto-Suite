@@ -1,9 +1,9 @@
 package Controller;
 
 import Model.SHAKE;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +21,7 @@ public class ToolController {
 
     private static boolean tEqualstPrime;
 
+
     ToolController() {
 
     }
@@ -32,30 +33,32 @@ public class ToolController {
 
         byte[] hash = SHAKE.KMACXOF256(byteKey, byteMessage, L, byteString);
 
-        return Hex.toHexString(hash);
+        return bytesToHex(hash);
     }
 
     public static String encrypt(String fileLocation, String passWord) throws IOException {
 
         Path path = Paths.get(fileLocation);
+        File file = new File(fileLocation);
+        String fn = file.getName();
         byte[] byteMessage = Files.readAllBytes(path);
         byte[] byteKey = (passWord != null) ? passWord.getBytes(): new byte[0];
-        try (FileOutputStream fos = new FileOutputStream("encrypted_file")) {
+        try (FileOutputStream fos = new FileOutputStream(fn + ".encrypted")) {
             fos.write(encryptKMACXOF256(byteMessage, byteKey));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println("File Encrypted: " + Hex.toHexString(byteMessage));
-        return Hex.toHexString(byteMessage);
+        System.out.println("File Encrypted: " + bytesToHex(byteMessage));
+        return bytesToHex(byteMessage);
     }
 
     public static String decrypt(String fileLocation, String passWord) throws IOException {
         Path path = Paths.get(fileLocation);
         byte[] byteCryptogram = Files.readAllBytes(path);
         byte[] byteKey = (passWord != null) ? passWord.getBytes(): new byte[0];
-        String decryptedMessage = Hex.toHexString(decryptKMACXOF256(byteCryptogram, byteKey));
+        String decryptedMessage = bytesToHex(decryptKMACXOF256(byteCryptogram, byteKey));
 
         if (tEqualstPrime) {
             System.out.println("File Decrypted: " + decryptedMessage);
@@ -97,7 +100,21 @@ public class ToolController {
 
     }
 
+    /**
+     *
+     * @param cryptogram
+     * @param pw
+     * @return
+     * @throws IOException
+     */
     private static byte[] decryptKMACXOF256(byte[] cryptogram, byte[] pw) throws IOException {
+
+        // Catch cryptograms that are too short
+        if (cryptogram.length < 129) {
+            System.out.println("Selected file is incorrect length for cryptogram");
+            return new byte[0];
+        }
+
         // Get z
         byte[] z = Arrays.copyOfRange(cryptogram, 0, 64);
 
@@ -129,6 +146,18 @@ public class ToolController {
 
     }
 
+
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
     /**
      * Converts a file to corresponding hex string
      *
@@ -139,7 +168,7 @@ public class ToolController {
     public static String convertFileToHex(final String fileLoc) throws IOException {
         Path path = Paths.get(fileLoc);
         byte[] data = Files.readAllBytes(path);
-        System.out.println(Hex.toHexString(data));
+        System.out.println(bytesToHex(data));
         return new String(data, "UTF-8");
     }
 

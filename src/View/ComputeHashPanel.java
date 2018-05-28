@@ -1,7 +1,6 @@
 package View;
 
 import Controller.ToolController;
-import org.bouncycastle.util.encoders.Hex;
 
 import javax.swing.*;
 import java.awt.*;
@@ -147,7 +146,7 @@ public class ComputeHashPanel extends JPanel {
 
     private void computeTextHash() throws NoSuchAlgorithmException {
         String hash = ToolController.getKMACXOF256HashString("", MESSAGE_AREA.getText(), 512, "D");
-        System.out.println(Hex.toHexString(MESSAGE_AREA.getText().getBytes()));
+        System.out.println(ToolController.bytesToHex(MESSAGE_AREA.getText().getBytes()));
         TEXT_HASH_OUTPUT.setText(hash);
     }
 

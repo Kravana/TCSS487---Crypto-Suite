@@ -1,8 +1,6 @@
 package Model;
 
 import java.util.Arrays;
-import Model.SHAKE;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Test driver for cSHAKE256 and KMACXOF256.
