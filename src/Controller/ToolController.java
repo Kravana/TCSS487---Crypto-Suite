@@ -26,7 +26,7 @@ public class ToolController {
 
     }
 
-    public static String getKMACXOF256HashString(String K, String X, int L, String S) {
+    public static String getKMACXOF256HashHexString(String K, String X, int L, String S) {
         byte[] byteKey = (K != null) ? K.getBytes(): new byte[0];
         byte[] byteMessage = (X != null) ? X.getBytes(): new byte[0];
         byte[] byteString = (S != null) ? S.getBytes(): new byte[0];
@@ -43,7 +43,7 @@ public class ToolController {
         String fn = file.getName();
         byte[] byteMessage = Files.readAllBytes(path);
         byte[] byteKey = (passWord != null) ? passWord.getBytes(): new byte[0];
-        try (FileOutputStream fos = new FileOutputStream(fn + ".encrypted")) {
+        try (FileOutputStream fos = new FileOutputStream(fn + ".cryptogram")) {
             fos.write(encryptKMACXOF256(byteMessage, byteKey));
 
         } catch (IOException e) {
@@ -69,6 +69,13 @@ public class ToolController {
         return decryptedMessage;
     }
 
+    /**
+     *
+     * @param m
+     * @param pw
+     * @return
+     * @throws IOException
+     */
     private static byte[] encryptKMACXOF256(byte[] m, byte[] pw) throws IOException {
         // Get z = Random(512)
         SecureRandom random = new SecureRandom();
@@ -168,7 +175,7 @@ public class ToolController {
     public static String convertFileToHex(final String fileLoc) throws IOException {
         Path path = Paths.get(fileLoc);
         byte[] data = Files.readAllBytes(path);
-        System.out.println(bytesToHex(data));
+//        System.out.println(bytesToHex(data));
         return new String(data, "UTF-8");
     }
 

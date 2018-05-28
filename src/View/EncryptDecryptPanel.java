@@ -6,23 +6,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Kevin Ravana
  * @version Spring 2018
  */
-public class EncryptDecryptPanel extends JPanel {
+class EncryptDecryptPanel extends JPanel {
 
     private JTextArea FILE_TO_ENCRYPT = new JTextArea(4, 20);
 
     private JTextArea DECRYPTED_FILE = new JTextArea(4, 20);
 
-    private JLabel FILE_TO_ENCRYPT_LABEL = new JLabel("File to encrypt (0x): ");
+    private JLabel FILE_TO_ENCRYPT_LABEL = new JLabel("Encrypted file: ");
 
-    private JLabel DECRYPTED_FILE_LABEL = new JLabel("Decrypted file (0x): ");
+    private JLabel DECRYPTED_FILE_LABEL = new JLabel("Decrypted result: ");
 
-    private JTextField PASSWORD_AREA = new JTextField("Enter passphrase here.");
+    private JTextField PASSWORD_AREA = new JTextField("password123");
 
     private Dimension DEFAULT_BUTTON_SIZE = new Dimension(150, 30);
 
@@ -38,7 +37,7 @@ public class EncryptDecryptPanel extends JPanel {
 
     private String cryptogramLocation;
 
-    public EncryptDecryptPanel() {
+    EncryptDecryptPanel() {
         super();
         initialize();
     }
@@ -181,8 +180,6 @@ public class EncryptDecryptPanel extends JPanel {
                     fileHexPane.revalidate();
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } catch (NoSuchAlgorithmException e1) {
-                    e1.printStackTrace();
                 }
             }
         });
@@ -198,8 +195,6 @@ public class EncryptDecryptPanel extends JPanel {
                     decryptFile();
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } catch (NoSuchAlgorithmException e1) {
-                    e1.printStackTrace();
                 }
             }
         });
@@ -209,9 +204,7 @@ public class EncryptDecryptPanel extends JPanel {
 
     private JButton returnButton() {
         JButton returnButton = new JButton("Return to Services");
-        returnButton.addActionListener(e -> {
-            returnToServices();
-        });
+        returnButton.addActionListener(e -> returnToServices());
         return returnButton;
     }
 
@@ -223,11 +216,11 @@ public class EncryptDecryptPanel extends JPanel {
         frame.repaint();
     }
 
-    private void encryptFile() throws IOException, NoSuchAlgorithmException {
+    private void encryptFile() throws IOException {
         ((JTextArea)(fileHexPane.getViewport().getView())).setText(ToolController.encrypt(fileLocation, PASSWORD_AREA.getText()));
     }
 
-    private void decryptFile() throws IOException, NoSuchAlgorithmException {
+    private void decryptFile() throws IOException {
         ((JTextArea)(cryptogramHexPane.getViewport().getView())).setText(ToolController.decrypt(cryptogramLocation, PASSWORD_AREA.getText()));
     }
 

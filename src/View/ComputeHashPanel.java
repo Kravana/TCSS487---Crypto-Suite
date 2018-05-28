@@ -14,9 +14,9 @@ import java.security.NoSuchAlgorithmException;
  */
 public class ComputeHashPanel extends JPanel {
 
-    private JLabel TEXT_HASH_OUTPUT = new JLabel();
+    private JTextArea TEXT_HASH_OUTPUT = new JTextArea(4, 20);
 
-    private JLabel FILE_HASH_OUTPUT = new JLabel();
+    private JTextArea FILE_HASH_OUTPUT = new JTextArea(4, 20);
 
     private JLabel TEXT_HASH_OUTPUT_LABEL = new JLabel("Text hash: ");
 
@@ -26,6 +26,10 @@ public class ComputeHashPanel extends JPanel {
 
     private File file;
 
+    private JScrollPane textHashHexPane;
+
+    private JScrollPane fileHashHexPane;
+
     private String fileLocation;
 
     public ComputeHashPanel() {
@@ -34,6 +38,18 @@ public class ComputeHashPanel extends JPanel {
     }
 
     private void initialize() {
+        textHashHexPane = new JScrollPane(new JPanel().add(TEXT_HASH_OUTPUT),
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        TEXT_HASH_OUTPUT.setEditable(false);
+        TEXT_HASH_OUTPUT.setLineWrap(true);
+
+        fileHashHexPane = new JScrollPane(new JPanel().add(FILE_HASH_OUTPUT),
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        FILE_HASH_OUTPUT.setEditable(false);
+        FILE_HASH_OUTPUT.setLineWrap(true);
+
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.CENTER;
@@ -64,11 +80,11 @@ public class ComputeHashPanel extends JPanel {
         gbc.gridy = 2;
         this.add(selectFileButton(), gbc);
 
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 3;
         this.add(computeHashButton(), gbc);
 
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 3;
         this.add(returnButton(), gbc);
 
@@ -78,7 +94,7 @@ public class ComputeHashPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 4;
-        this.add(TEXT_HASH_OUTPUT, gbc);
+        this.add(textHashHexPane, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -86,7 +102,7 @@ public class ComputeHashPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 5;
-        this.add(FILE_HASH_OUTPUT, gbc);
+        this.add(fileHashHexPane, gbc);
 
 
     }
@@ -95,11 +111,12 @@ public class ComputeHashPanel extends JPanel {
         JButton selectFileButton = new JButton("Select File");
         selectFileButton.addActionListener(e -> {
             final JFileChooser fc = new JFileChooser();
+            File workingDirectory = new File(System.getProperty("user.dir"));
+            fc.setCurrentDirectory(workingDirectory);
             int returnValue = fc.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 file = fc.getSelectedFile();
                 fileLocation = file.getAbsolutePath();
-                System.out.println(file.getAbsolutePath());
             }
         });
         selectFileButton.setSize(new Dimension(100, selectFileButton.getHeight()));
@@ -145,13 +162,12 @@ public class ComputeHashPanel extends JPanel {
     }
 
     private void computeTextHash() throws NoSuchAlgorithmException {
-        String hash = ToolController.getKMACXOF256HashString("", MESSAGE_AREA.getText(), 512, "D");
-        System.out.println(ToolController.bytesToHex(MESSAGE_AREA.getText().getBytes()));
-        TEXT_HASH_OUTPUT.setText(hash);
+        ((JTextArea)(textHashHexPane.getViewport().getView())).setText(ToolController.getKMACXOF256HashHexString("",
+                MESSAGE_AREA.getText(), 512, "D"));
     }
 
     private void computeFileHash() throws IOException, NoSuchAlgorithmException {
-        String hash = ToolController.getKMACXOF256HashString("", ToolController.convertFileToHex(fileLocation), 512, "D");
-        FILE_HASH_OUTPUT.setText(hash);
+        ((JTextArea)(fileHashHexPane.getViewport().getView())).setText(ToolController.getKMACXOF256HashHexString("",
+                ToolController.convertFileToHex(fileLocation), 512, "D"));
     }
 }
