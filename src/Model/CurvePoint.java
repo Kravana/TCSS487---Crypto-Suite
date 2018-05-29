@@ -1,7 +1,6 @@
 package Model;
 
 import java.math.BigInteger;
-import java.util.Objects;
 
 /**
  * Created by Kevin on 5/28/2018.
@@ -9,7 +8,7 @@ import java.util.Objects;
 public class CurvePoint {
 
 
-    private final BigInteger p = BigInteger.valueOf((long)Math.pow(2, 521));
+    private static final BigInteger p = BigInteger.valueOf((long)Math.pow(2, 521)).subtract(BigInteger.valueOf(1));
 
     private final long d = -376014;
 
@@ -29,14 +28,15 @@ public class CurvePoint {
     }
 
     public CurvePoint(BigInteger theX, boolean theYLSB) {
-
+        x = theX;
+        y = sqrt(computeRadicand(theX), p, theYLSB);
     }
 
-    public CurvePoint generateBasePoint() {
+    public static CurvePoint getBasePoint() {
         return new CurvePoint(BigInteger.valueOf(18), false);
     }
 
-    public CurvePoint getNeutralElement() {
+    public static CurvePoint getNeutralElement() {
         return new CurvePoint(BigInteger.ZERO, BigInteger.ONE);
     }
 
@@ -48,23 +48,51 @@ public class CurvePoint {
         return y;
     }
 
-    public boolean equals(CurvePoint a, CurvePoint b) {
-        return Objects.equals(a.getX(), b.getX()) && Objects.equals(a.getY(), b.getY());
+    /**
+     * Compares two CurvePoints for equality.
+     *
+     * @param secondPoint Point to compare with this
+     * @return True if equal
+     */
+    public boolean equals(CurvePoint secondPoint) {
+        return this.getX().equals(secondPoint.getX()) && this.getY().equals(secondPoint.getY());
     }
 
+    /**
+     *
+     * @return The inverse of this.
+     */
     public CurvePoint getInverse() {
         return new CurvePoint(BigInteger.valueOf(-1).multiply(this.getX()), this.getY());
     }
 
+    /**
+     * A point composition operation that yields another CurvePoint.
+     *
+     * @param theSecondPoint Point to sum with this
+     * @return New point x3
+     */
     public CurvePoint computePointSum(CurvePoint theSecondPoint) {
         BigInteger x1 = this.getX();
         BigInteger y1 = this.getY();
         BigInteger x2 = theSecondPoint.getX();
         BigInteger y2 = theSecondPoint.getY();
 
-
+//        BigInteger x3 =
 
         return null;
+    }
+
+    /**
+     * Computes the radicand v for the sqrt() method.
+     *
+     * @param x The x value of a CurvePoint
+     * @return The radicand v for the sqrt fucntion
+     */
+    private static BigInteger computeRadicand(BigInteger x) {
+        BigInteger numerator = BigInteger.valueOf(1).subtract(x.pow(2));
+        BigInteger denominator = BigInteger.valueOf(1).add(BigInteger.valueOf(376014).multiply(x.pow(2))).modInverse(p);
+        return numerator.multiply(denominator);
     }
 
     /**
@@ -78,7 +106,7 @@ public class CurvePoint {
      * @return a square root r of v mod p with r mod 2 = 1 iff lsb = true
      * if such a root exists, otherwise null.
      */
-    public static BigInteger sqrt(BigInteger v, BigInteger p, boolean lsb) {
+    private static BigInteger sqrt(BigInteger v, BigInteger p, boolean lsb) {
         assert (p.testBit(0) && p.testBit(1)); // p = 3 (mod 4)
         if (v.signum() == 0) {
             return BigInteger.ZERO;
