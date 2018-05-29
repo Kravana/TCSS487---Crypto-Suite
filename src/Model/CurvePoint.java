@@ -1,38 +1,34 @@
 package Model;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * Created by Kevin on 5/28/2018.
  */
-public class CurvePoint {
+public class CurvePoint implements Serializable {
 
 
-    private static final BigInteger p = BigInteger.valueOf((long)Math.pow(2, 521)).subtract(BigInteger.valueOf(1));
+    private static final BigInteger p = BigInteger.valueOf(2).pow(521).subtract(BigInteger.ONE);
 
-    private final long d = -376014;
-
-
+    private static final long d = -376014;
 
     private BigInteger x;
 
     private BigInteger y;
 
 
-
-
-
-    public CurvePoint(BigInteger theX, BigInteger theY) {
-        x = theX;
-        y = theY;
+    private CurvePoint(BigInteger theX, BigInteger theY) {
+        x = theX.mod(p);
+        y = theY.mod(p);
     }
 
-    public CurvePoint(BigInteger theX, boolean theYLSB) {
-        x = theX;
+    private CurvePoint(BigInteger theX, boolean theYLSB) {
+        x = theX.mod(p);
         y = sqrt(computeRadicand(theX), p, theYLSB);
     }
 
-    public static CurvePoint getBasePoint() {
+    private static CurvePoint generateBasePoint() {
         return new CurvePoint(BigInteger.valueOf(18), false);
     }
 
@@ -48,39 +44,68 @@ public class CurvePoint {
         return y;
     }
 
-    /**
-     * Compares two CurvePoints for equality.
-     *
-     * @param secondPoint Point to compare with this
-     * @return True if equal
-     */
-    public boolean equals(CurvePoint secondPoint) {
-        return this.getX().equals(secondPoint.getX()) && this.getY().equals(secondPoint.getY());
-    }
 
     /**
      *
      * @return The inverse of this.
      */
-    public CurvePoint getInverse() {
+    private CurvePoint getInverse() {
         return new CurvePoint(BigInteger.valueOf(-1).multiply(this.getX()), this.getY());
     }
 
     /**
+     * Point dot function: Y = x dot G.
+     *
+     * @param privateKey x
+     * @return Y
+     */
+    public static CurvePoint getECPublicKey(BigInteger privateKey) {
+        CurvePoint G = generateBasePoint();
+        CurvePoint Y = G;
+        System.out.println("G: " + G.getX().toString() + ", " + G.getY().toString());
+        System.out.println("Y: " + Y.getX().toString() + ", " + Y.getY().toString());
+//        BigInteger r = new BigInteger(String.valueOf(Math.pow(2, 519))).
+//                subtract(new BigInteger("337554763258501705789107630418782636071").
+//                        divide(new BigInteger("904961214051226618635150085779108655765")));
+//        String x = privateKey.mod(r).toString(2);
+        String x = privateKey.toString(2);
+        for (int i = x.length() - 1; i >= 0; i--) {
+//            System.out.println(x.charAt(i));
+            Y = Y.computePointSum(Y);
+            if (x.charAt(i) == '1') {
+                Y = Y.computePointSum(G);
+            }
+        }
+        System.out.println("Y: " + Y.getX().toString() + ", " + Y.getY().toString());
+        return Y;
+    }
+
+    /**
      * A point composition operation that yields another CurvePoint.
+     * Formula works for points on Edwards curves.
      *
      * @param theSecondPoint Point to sum with this
      * @return New point x3
      */
-    public CurvePoint computePointSum(CurvePoint theSecondPoint) {
+    private CurvePoint computePointSum(CurvePoint theSecondPoint) {
         BigInteger x1 = this.getX();
         BigInteger y1 = this.getY();
         BigInteger x2 = theSecondPoint.getX();
         BigInteger y2 = theSecondPoint.getY();
 
-//        BigInteger x3 =
+        BigInteger x3Numerator = x1.multiply(y2).add(y1.multiply(x2));
+        BigInteger x3Denominator = BigInteger.ONE.add(BigInteger.valueOf(d).
+                multiply(x1.multiply(x2.multiply(y1. multiply(y2)))));
+//        System.out.println("X3: " + x3Numerator.toString() + ", " + x3Denominator.toString());
+        BigInteger x3 = x3Numerator.multiply(x3Denominator.modInverse(p));
 
-        return null;
+        BigInteger y3Numerator = y1.multiply(y2).subtract(x1.multiply(x2));
+        BigInteger y3Denominator = BigInteger.ONE.subtract(BigInteger.valueOf(d).
+                multiply(x1.multiply(x2.multiply(y1.multiply(y2)))));
+//        System.out.println("X3: " + y3Numerator.toString() + ", " + y3Denominator.toString());
+        BigInteger y3 = y3Numerator.multiply(y3Denominator.modInverse(p));
+//        System.out.println(x3 + ", " + y3);
+        return new CurvePoint(x3, y3);
     }
 
     /**
@@ -90,9 +115,9 @@ public class CurvePoint {
      * @return The radicand v for the sqrt fucntion
      */
     private static BigInteger computeRadicand(BigInteger x) {
-        BigInteger numerator = BigInteger.valueOf(1).subtract(x.pow(2));
+        BigInteger numerator = BigInteger.valueOf(1).subtract(x.pow(2)).mod(p);
         BigInteger denominator = BigInteger.valueOf(1).add(BigInteger.valueOf(376014).multiply(x.pow(2))).modInverse(p);
-        return numerator.multiply(denominator);
+        return numerator.divide(denominator);
     }
 
     /**
@@ -116,6 +141,21 @@ public class CurvePoint {
             r = p.subtract(r); // correct the lsb
         }
         return (r.multiply(r).subtract(v).mod(p).signum() == 0) ? r : null;
+    }
+
+
+    /**
+     * Compares two CurvePoints for equality.
+     *
+     * @param secondPoint Point to compare with this
+     * @return True if equal
+     */
+    public boolean equals(CurvePoint secondPoint) {
+        return this.getX().equals(secondPoint.getX()) && this.getY().equals(secondPoint.getY());
+    }
+
+    public CurvePoint copy(CurvePoint original) {
+        return new CurvePoint(original.getX(), original.getY());
     }
 
 }
