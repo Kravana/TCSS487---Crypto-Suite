@@ -1,6 +1,6 @@
 package View;
 
-import Controller.ToolController;
+import Controller.KMACController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -162,12 +162,12 @@ public class ComputeHashPanel extends JPanel {
     }
 
     private void computeTextHash() throws NoSuchAlgorithmException {
-        ((JTextArea)(textHashHexPane.getViewport().getView())).setText(ToolController.getKMACXOF256HashHexString("",
+        ((JTextArea)(textHashHexPane.getViewport().getView())).setText(KMACController.getKMACXOF256HashHexString("",
                 MESSAGE_AREA.getText(), 512, "D"));
     }
 
     private void computeFileHash() throws IOException, NoSuchAlgorithmException {
-        ((JTextArea)(fileHashHexPane.getViewport().getView())).setText(ToolController.getKMACXOF256HashHexString("",
-                ToolController.convertFileToHex(fileLocation), 512, "D"));
+        ((JTextArea)(fileHashHexPane.getViewport().getView())).setText(KMACController.getKMACXOF256HashHexString("",
+                KMACController.convertFileToHex(fileLocation), 512, "D"));
     }
 }

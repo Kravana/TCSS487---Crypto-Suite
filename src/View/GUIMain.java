@@ -2,6 +2,7 @@ package View;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigInteger;
 
 /**
  * @author Kevin Ravana
@@ -19,7 +20,7 @@ public class GUIMain {
                 @Override
                 public void run()
                 {
-                    final JFrame window = new JFrame();
+                    final JFrame window = new JFrame("TCSS 487 Practical Project");
                     final JPanel mainPanel = new HomePanel();
 
                     window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,7 +29,7 @@ public class GUIMain {
                     window.setLocationRelativeTo(null);
                     window.setVisible(true);
 
-                    window.setSize(new Dimension(1350, 450));
+                    window.setSize(new Dimension(1000, 450));
                 }
             });
         }

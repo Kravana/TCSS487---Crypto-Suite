@@ -28,7 +28,7 @@ public class CurvePoint implements Serializable {
         y = sqrt(computeRadicand(theX), p, theYLSB);
     }
 
-    private static CurvePoint generateBasePoint() {
+    public static CurvePoint generateBasePoint() {
         return new CurvePoint(BigInteger.valueOf(18), false);
     }
 
@@ -59,24 +59,15 @@ public class CurvePoint implements Serializable {
      * @param privateKey x
      * @return Y
      */
-    public static CurvePoint getECPublicKey(BigInteger privateKey) {
-        CurvePoint G = generateBasePoint();
+    public static CurvePoint getECExponentiation(BigInteger privateKey, CurvePoint G) {
         CurvePoint Y = G;
-        System.out.println("G: " + G.getX().toString() + ", " + G.getY().toString());
-        System.out.println("Y: " + Y.getX().toString() + ", " + Y.getY().toString());
-//        BigInteger r = new BigInteger(String.valueOf(Math.pow(2, 519))).
-//                subtract(new BigInteger("337554763258501705789107630418782636071").
-//                        divide(new BigInteger("904961214051226618635150085779108655765")));
-//        String x = privateKey.mod(r).toString(2);
         String x = privateKey.toString(2);
         for (int i = x.length() - 1; i >= 0; i--) {
-//            System.out.println(x.charAt(i));
             Y = Y.computePointSum(Y);
             if (x.charAt(i) == '1') {
                 Y = Y.computePointSum(G);
             }
         }
-        System.out.println("Y: " + Y.getX().toString() + ", " + Y.getY().toString());
         return Y;
     }
 
@@ -95,14 +86,18 @@ public class CurvePoint implements Serializable {
 
         BigInteger x3Numerator = x1.multiply(y2).add(y1.multiply(x2));
         BigInteger x3Denominator = BigInteger.ONE.add(BigInteger.valueOf(d).
-                multiply(x1.multiply(x2.multiply(y1. multiply(y2)))));
-//        System.out.println("X3: " + x3Numerator.toString() + ", " + x3Denominator.toString());
+                multiply(x1.
+                        multiply(x2.
+                                multiply(y1.
+                                        multiply(y2)))));
         BigInteger x3 = x3Numerator.multiply(x3Denominator.modInverse(p));
 
         BigInteger y3Numerator = y1.multiply(y2).subtract(x1.multiply(x2));
         BigInteger y3Denominator = BigInteger.ONE.subtract(BigInteger.valueOf(d).
-                multiply(x1.multiply(x2.multiply(y1.multiply(y2)))));
-//        System.out.println("X3: " + y3Numerator.toString() + ", " + y3Denominator.toString());
+                multiply(x1.
+                        multiply(x2.
+                                multiply(y1.
+                                        multiply(y2)))));
         BigInteger y3 = y3Numerator.multiply(y3Denominator.modInverse(p));
 //        System.out.println(x3 + ", " + y3);
         return new CurvePoint(x3, y3);

@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,12 +18,12 @@ import java.util.Arrays;
  * @author Kevin Ravana
  * @version Spring 2018
  */
-public class ToolController {
+public class KMACController {
 
     private static boolean tEqualstPrime;
 
 
-    ToolController() {
+    KMACController() {
 
     }
 
@@ -43,7 +44,7 @@ public class ToolController {
         String fn = file.getName();
         byte[] byteMessage = Files.readAllBytes(path);
         byte[] byteKey = (passWord != null) ? passWord.getBytes(): new byte[0];
-        try (FileOutputStream fos = new FileOutputStream(fn + ".cryptogram")) {
+        try (FileOutputStream fos = new FileOutputStream(fn + ".KMAC_cryptogram")) {
             fos.write(encryptKMACXOF256(byteMessage, byteKey));
 
         } catch (IOException e) {
@@ -178,5 +179,7 @@ public class ToolController {
 //        System.out.println(bytesToHex(data));
         return new String(data, "UTF-8");
     }
+
+
 
 }
