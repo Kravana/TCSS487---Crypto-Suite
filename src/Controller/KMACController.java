@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -90,14 +89,14 @@ public class KMACController {
         byte[] keka = SHAKE.KMACXOF256(oskeka.toByteArray(), new byte[0], 1024, "S".getBytes());
 
         // Get c
-        byte[] kmacForC = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 0, 32), "".getBytes(), m.length * 8, "SKE".getBytes());
+        byte[] kmacForC = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 0, 64), "".getBytes(), m.length * 8, "SKE".getBytes());
         byte[] c = new byte[m.length];
         for (int i = 0; i < m.length; i++) {
             c[i] = (byte) (m[i] ^ kmacForC[i]);
         }
 
         // Get t
-        byte[] t = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 32, 64), m, 512, "SKA".getBytes());
+        byte[] t = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 64, 128), m, 512, "SKA".getBytes());
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         os.write(z);
@@ -139,14 +138,14 @@ public class KMACController {
         byte[] c = Arrays.copyOfRange(cryptogram,64, cryptogram.length - 64);
 
         // Get m
-        byte[] kmacForM = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 0, 32), "".getBytes(), c.length * 8, "SKE".getBytes());
+        byte[] kmacForM = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 0, 64), "".getBytes(), c.length * 8, "SKE".getBytes());
         byte[] m = new byte[c.length];
         for (int i = 0; i < c.length; i++) {
             m[i] = (byte) (c[i] ^ kmacForM[i]);
         }
 
         // Get t'
-        byte[] tPrime = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 32, 64), m, 512, "SKA".getBytes());
+        byte[] tPrime = SHAKE.KMACXOF256(Arrays.copyOfRange(keka, 64, 128), m, 512, "SKA".getBytes());
 
         tEqualstPrime = Arrays.equals(t, tPrime);
 

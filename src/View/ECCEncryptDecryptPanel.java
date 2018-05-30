@@ -1,7 +1,6 @@
 package View;
 
 import Controller.ECCController;
-import Controller.KMACController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,21 +17,9 @@ class ECCEncryptDecryptPanel extends JPanel {
 
     private JTextArea DECRYPTED_FILE = new JTextArea(4, 20);
 
-    private JTextArea PRIVATE_KEY = new JTextArea(4, 20);
-
-    private JTextArea PUBLIC_KEY_X = new JTextArea(4, 20);
-
-    private JTextArea PUBLIC_KEY_Y = new JTextArea(4, 20);
-
     private JLabel FILE_TO_ENCRYPT_LABEL = new JLabel("Encrypted file: ");
 
     private JLabel DECRYPTED_FILE_LABEL = new JLabel("Decrypted result: ");
-
-    private JLabel PRIVATE_KEY_LABEL = new JLabel("Private key: ");
-
-    private JLabel PUBLIC_KEY_X_LABEL = new JLabel("Public key x: ");
-
-    private JLabel PUBLIC_KEY_Y_LABEL = new JLabel("Public key y: ");
 
     private JTextField PASSWORD_AREA = new JTextField("password123");
 
@@ -46,15 +33,11 @@ class ECCEncryptDecryptPanel extends JPanel {
 
     private JScrollPane cryptogramHexPane;
 
-    private JScrollPane privateKeyPane;
-
-    private JScrollPane publicKeyXPane;
-
-    private JScrollPane publicKeyYPane;
-
     private String fileLocation;
 
     private String cryptogramLocation;
+
+    private String publicKeyFileLocation;
 
     private ECCController ec;
 
@@ -91,24 +74,6 @@ class ECCEncryptDecryptPanel extends JPanel {
         DECRYPTED_FILE.setEditable(false);
         DECRYPTED_FILE.setLineWrap(true);
 
-        privateKeyPane = new JScrollPane(new JPanel().add(PRIVATE_KEY),
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        PRIVATE_KEY.setEditable(false);
-        PRIVATE_KEY.setLineWrap(true);
-
-        publicKeyXPane = new JScrollPane(new JPanel().add(PUBLIC_KEY_X),
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        PUBLIC_KEY_X.setEditable(false);
-        PUBLIC_KEY_X.setLineWrap(true);
-
-        publicKeyYPane = new JScrollPane(new JPanel().add(PUBLIC_KEY_Y),
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        PUBLIC_KEY_Y.setEditable(false);
-        PUBLIC_KEY_Y.setLineWrap(true);
-
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.CENTER;
@@ -129,29 +94,25 @@ class ECCEncryptDecryptPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        this.add(new JLabel("and"), gbc);
+        this.add(new JLabel("Select a public key file: "), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        this.add(new JLabel("Generate a key pair: "), gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        this.add(selectPublicKeyFileButton(), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        this.add(generateKeyPairButton(), gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 2;
         this.add(selectFileToEncryptButton, gbc);
 
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 3;
         this.add(selectFileToDecryptButton, gbc);
 
-        gbc.gridx = 3;
+        gbc.gridx = 2;
         gbc.gridy = 2;
         this.add(encryptFileButton, gbc);
 
-        gbc.gridx = 3;
+        gbc.gridx = 2;
         gbc.gridy = 3;
         this.add(decryptFileButton, gbc);
 
@@ -159,44 +120,20 @@ class ECCEncryptDecryptPanel extends JPanel {
         gbc.gridy = 3;
         this.add(returnButton(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        this.add(PRIVATE_KEY_LABEL, gbc);
-
         gbc.gridx = 1;
-        gbc.gridy = 4;
-        this.add(privateKeyPane, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         this.add(FILE_TO_ENCRYPT_LABEL, gbc);
 
-        gbc.gridx = 3;
-        gbc.gridy = 4;
-        this.add(fileHexPane, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        this.add(PUBLIC_KEY_X_LABEL, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        this.add(PUBLIC_KEY_Y_LABEL, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 5;
-        this.add(publicKeyXPane, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 6;
-        this.add(publicKeyYPane, gbc);
-
         gbc.gridx = 2;
         gbc.gridy = 5;
+        this.add(fileHexPane, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 6;
         this.add(DECRYPTED_FILE_LABEL, gbc);
 
-        gbc.gridx = 3;
-        gbc.gridy = 5;
+        gbc.gridx = 2;
+        gbc.gridy = 6;
         this.add(cryptogramHexPane, gbc);
 
 
@@ -238,17 +175,21 @@ class ECCEncryptDecryptPanel extends JPanel {
         return selectFileButton;
     }
 
-    private JButton generateKeyPairButton() {
-        JButton generateKeyPairButton = new JButton("Generate Key Pair");
-        generateKeyPairButton.addActionListener(e -> {
-            try {
-                generateKeyPair();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+    private JButton selectPublicKeyFileButton() {
+        JButton selectPublicKeyFileButton = new JButton("Select public key file");
+        selectPublicKeyFileButton.addActionListener(e -> {
+            final JFileChooser fc = new JFileChooser();
+            File workingDirectory = new File(System.getProperty("user.dir"));
+            fc.setCurrentDirectory(workingDirectory);
+            int returnValue = fc.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                publicKeyFileLocation = file.getAbsolutePath();
+                System.out.println(file.getAbsoluteFile());
             }
         });
-        generateKeyPairButton.setSize(new Dimension(100, generateKeyPairButton.getHeight()));
-        return generateKeyPairButton;
+        selectPublicKeyFileButton.setSize(new Dimension(100, selectPublicKeyFileButton.getHeight()));
+        return selectPublicKeyFileButton;
     }
 
     private JButton encryptFileButton() {
@@ -296,20 +237,12 @@ class ECCEncryptDecryptPanel extends JPanel {
         frame.repaint();
     }
 
-    private void generateKeyPair() throws IOException {
-        ec = new ECCController();
-        ec.generateECDHIESKeyPair(PASSWORD_AREA.getText());
-        ((JTextArea)(privateKeyPane.getViewport().getView())).setText(ec.ECDHIESPrivateKeyToString());
-        ((JTextArea)(publicKeyXPane.getViewport().getView())).setText(ec.ECDHIESPublicKeyXToString());
-        ((JTextArea)(publicKeyYPane.getViewport().getView())).setText(ec.ECDHIESPublicKeyYToString());
-    }
-
     private void encryptFile() throws IOException {
-        ((JTextArea)(fileHexPane.getViewport().getView())).setText(KMACController.encrypt(fileLocation, PASSWORD_AREA.getText()));
+        ((JTextArea)(fileHexPane.getViewport().getView())).setText(ECCController.encrypt(fileLocation, publicKeyFileLocation, PASSWORD_AREA.getText()));
     }
 
     private void decryptFile() throws IOException {
-        ((JTextArea)(cryptogramHexPane.getViewport().getView())).setText(KMACController.decrypt(cryptogramLocation, PASSWORD_AREA.getText()));
+        ((JTextArea)(cryptogramHexPane.getViewport().getView())).setText(ECCController.decrypt(cryptogramLocation, PASSWORD_AREA.getText()));
     }
 
 }

@@ -153,4 +153,8 @@ public class CurvePoint implements Serializable {
         return new CurvePoint(original.getX(), original.getY());
     }
 
+//    public String curveToString() {
+//        return "x: " + x + "\n" + "y: " + y;
+//    }
+
 }
